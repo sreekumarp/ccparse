@@ -1,0 +1,174 @@
+<div class="mat-content" class="inset" style="padding-bottom: 200px">
+  <mat-tab-group (selectedIndexChange)="selectedIndexChange($event)">
+    <mat-tab label="First">
+      <div fxLayout.gt-xs="row">
+        <div fxFlex.gt-xs="100">
+          <mat-card>
+            <mat-card-title
+              >CC My Comments
+              <mat-form-field
+                style="font-size: 12px;
+              margin-left: 500px;"
+              >
+                <mat-select
+                  [(ngModel)]="selectedMonthYear"
+                  placeholder="MonthYear"
+                  (selectionChange)="monthYear($event)"
+                >
+                  <mat-option value="Dec2017">Dec2017</mat-option>
+                  <mat-option value="Jan2018">Jan2018</mat-option>
+                  <mat-option value="Feb2018">Feb2018</mat-option>
+                  <mat-option value="Mar2018">Mar2018</mat-option>
+                  <mat-option value="Apr2018">Apr2018</mat-option>
+                  <mat-option value="May2018">May2018</mat-option>
+                  <mat-option value="Jun2018">Jun2018</mat-option>
+                  <mat-option value="Jul2018">Jul2018</mat-option>
+                  <mat-option value="Aug2018">Aug2018</mat-option>
+                  <mat-option value="Sep2018">Sep2018</mat-option>
+                  <mat-option value="Oct2018">Oct2018</mat-option>
+                  <mat-option value="Nov2018">Nov2018</mat-option>
+                  <mat-option value="Dec2018">Dec2018</mat-option>
+                  <mat-option value="Jan2019">Jan2019</mat-option>
+                  <mat-option value="Feb2019">Feb2019</mat-option>
+                  <mat-option value="Mar2019">Mar2019</mat-option>
+                  <mat-option value="Apr2019">Apr2019</mat-option>
+                  <mat-option value="Jun2019">Jun2019</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-card-title>
+            <mat-divider></mat-divider>
+            <div class="chart-height push-top-sm"><textarea layout-fill [(ngModel)]="CCMyComments"></textarea></div>
+            <mat-divider></mat-divider>
+            <!--  <mat-card-actions>
+            <a mat-button color="accent"> <span class="text-upper">View Stats</span> </a>
+          </mat-card-actions> -->
+          </mat-card>
+        </div>
+        <!--
+        <div fxFlex.gt-xs="50">
+          <mat-card>
+            <mat-card-title>HDFC CC My Comments</mat-card-title>
+            <mat-divider></mat-divider>
+            <div class="chart-height push-top-sm">
+              <textarea layout-fill [(ngModel)]="hdfcCCMyComments"></textarea>
+            </div>
+            <mat-divider></mat-divider>
+            <mat-card-actions>
+              <a mat-button color="accent">
+                <span class="text-upper">View Stats</span>
+              </a>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      --></div>
+      <div fxLayout.gt-xs="row">
+        <div fxFlex.gt-xs="50">
+          <mat-card>
+            <mat-card-title>CITI CC Statement</mat-card-title>
+            <mat-divider></mat-divider>
+            <div class="chart-height push-top-sm"><textarea layout-fill [(ngModel)]="citiCCStatement"></textarea></div>
+            <mat-divider></mat-divider>
+            <!-- <mat-card-actions>
+            <a mat-button color="accent"> <span class="text-upper">View Stats</span> </a>
+          </mat-card-actions> -->
+          </mat-card>
+        </div>
+        <div fxFlex.gt-xs="50">
+          <mat-card>
+            <mat-card-title>HDFC CC Statement</mat-card-title>
+            <mat-divider></mat-divider>
+            <div class="chart-height push-top-sm"><textarea layout-fill [(ngModel)]="hdfcCCStatement"></textarea></div>
+            <mat-divider></mat-divider>
+            <!-- <mat-card-actions>
+            <a mat-button color="accent"> <span class="text-upper">View Stats</span> </a>
+          </mat-card-actions> -->
+          </mat-card>
+        </div>
+      </div>
+      <ag-grid-angular
+        [context]="context"
+        [frameworkComponents]="frameworkComponents"
+        class="ag-theme-balham"
+        style="width: 100%; height: 550px;"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        [rowData]="hdfcStatementEntires"
+        enableColResize
+        enableSorting
+        enableFilter
+        suppressRowClickSelection
+        sideBar="filter"
+        [enableRangeSelection]="true"
+        rowSelection="multiple"
+      >
+      </ag-grid-angular>
+      <ag-grid-angular
+        [context]="context"
+        [frameworkComponents]="frameworkComponents"
+        class="ag-theme-balham"
+        style="width: 100%; height: 550px;"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        [rowData]="citiStatementEntires"
+        enableColResize
+        enableSorting
+        enableFilter
+        suppressRowClickSelection
+        sideBar="filter"
+        [enableRangeSelection]="true"
+        rowSelection="multiple"
+      >
+      </ag-grid-angular
+    ></mat-tab>
+    <mat-tab label="All"
+      ><ag-grid-angular
+        [context]="context"
+        [frameworkComponents]="frameworkComponents"
+        class="ag-theme-balham"
+        style="width: 100%; height: 550px;"
+        [gridOptions]="gridOptions"
+        [columnDefs]="allColumnDefs"
+        [rowData]="allStatementEntires"
+        enableColResize
+        enableSorting
+        enableFilter
+        suppressRowClickSelection
+        sideBar="filter"
+        [enableRangeSelection]="true"
+        rowSelection="multiple"
+      >
+      </ag-grid-angular>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+<a
+  mat-fab
+  color="accent"
+  style="position: fixed;
+bottom: 15px;
+right: 15px;
+z-index: 100;
+display: flex;
+flex-direction: column-reverse;
+align-items: center;"
+  class="mat-fab-bottom-right fixed"
+  (click)="process()"
+>
+  <mat-icon>done</mat-icon>
+</a>
+
+<a
+  mat-fab
+  color="accent"
+  style="position: fixed;
+bottom: 15px;
+right: 85px;
+z-index: 100;
+display: flex;
+flex-direction: column-reverse;
+align-items: center;"
+  class="mat-fab-bottom-right fixed"
+  (click)="save()"
+>
+  <mat-icon>save</mat-icon>
+</a>
