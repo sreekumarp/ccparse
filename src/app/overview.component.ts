@@ -283,18 +283,33 @@ export class ProductOverviewComponent implements OnInit {
   selectedIndexChange(tab: number) {
     if (tab == 1) {
       const all: Entry[] = [];
-      this.hdfcStatementEntires.forEach(this.toAll(all));
-      this.citiStatementEntires.forEach(this.toAll(all));
+      var backup = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        var value = localStorage.getItem(key);
+        if (key != 'monthYear' && key.indexOf('StatementEntires') > -1) {
+          //backup[key] =
+          //const data = escape(encodeURIComponent(value));
+          const parsedData = JSON.parse(value) as Entry[];
+          parsedData.forEach(this.toAll(all));
+        }
+      }
+      //this.hdfcStatementEntires.forEach(this.toAll(all));
+      //this.citiStatementEntires.forEach(this.toAll(all));
       this.allStatementEntires = Object.assign([], all);
     }
   }
 
   private toAll(all: Entry[]): (value: Entry, index: number, array: Entry[]) => void {
     return entry => {
-      const entryCopy = Object.assign({}, entry);
-      entryCopy.description = entryCopy.description + ' | ' + entryCopy.descriptionComment;
-      all.push(entryCopy);
+      this.pushToAll(entry, all);
     };
+  }
+
+  private pushToAll(entry: Entry, all: Entry[]) {
+    const entryCopy = Object.assign({}, entry);
+    entryCopy.description = entryCopy.description; // + ' | ' + entryCopy.descriptionComment;
+    all.push(entryCopy);
   }
 
   methodFromParent(entries) {
@@ -376,7 +391,9 @@ export class ProductOverviewComponent implements OnInit {
           .find(
             entryCompare => entry.emiNumber == entryCompare.emiNumber && entry.companyCode == entryCompare.companyCode
           );
-        this.mergeInterestAmt(entry, interestfounds, interestList);
+        if (interestfounds && interestList.length > 0) {
+          this.mergeInterestAmt(entry, interestfounds, interestList);
+        }
       });
   }
 
@@ -428,7 +445,12 @@ export class ProductOverviewComponent implements OnInit {
         const codes = code.split(',');
         if (codes && codes.length > 1) {
           entry.emiNumber = parseFloat(codes[0]);
-          entry.companyCode = parseInt(codes[1]);
+          const cmpyCodes = codes[1].split(' ');
+          let cmpyCode = '';
+          if (cmpyCodes.length > 0) {
+            cmpyCode = cmpyCodes[0];
+          }
+          entry.companyCode = parseInt(cmpyCode);
         }
         interestList.push(entry);
       }
