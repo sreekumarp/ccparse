@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Title } from '@angular/platform-browser';
-import { ColDef, GridOptions } from 'ag-grid-community';
+import { ColDef, GridApi, GridOptions } from 'ag-grid-community';
 //declare var moment: any;
 import 'ag-grid-enterprise';
 import * as moment from 'moment';
@@ -33,7 +33,7 @@ export class ProductOverviewComponent implements OnInit {
   public gridOptions: GridOptions;
   public columnDefs: ColDef[];
   public allColumnDefs: ColDef[];
-
+  public api: GridApi;
   public frameworkComponents;
 
   // Generic Chart options
@@ -129,7 +129,35 @@ export class ProductOverviewComponent implements OnInit {
         return data.amountEntries;
       }, */
       onGridReady: function(params) {
+        var sort = [
+          {
+            colId: 'date',
+            sort: 'asc'
+          }
+        ];
+        params.api.setSortModel(sort);
+        this.api = params.api;
         //params.api.sizeColumnsToFit();
+      },
+      // This is called any type we hit CTRL C
+      processCellForClipboard: params => {
+        /* params should look like:
+         {
+         column: column,
+         node: rowNode,
+         value: value,
+         api: this.gridOptionsWrapper.getApi(),
+         columnApi: this.gridOptionsWrapper.getColumnApi(),
+         context: this.gridOptionsWrapper.getContext()
+         }
+         */
+        if (params.column.getColId() == 'date') {
+          console.log('processCellForClipboard called (gridoptions)', params);
+          return moment(params.value).format('DD-MMM-YYYY');
+        } else if (params.column.getColId() == 'isCiti') {
+          return params.value ? 'CITI' : 'HDFC';
+        }
+        return params.value;
       }
       /* autoGroupColumnDef: {
         headerName: 'Amounts',
@@ -171,22 +199,29 @@ export class ProductOverviewComponent implements OnInit {
     this.columnDefs = [];
 
     //TODO: move this to report configuation with an static field/col name
-    /* this.columnDefs.push({
+    this.columnDefs.push({
       width: 95,
       headerName: 'Date',
       field: 'date',
       valueFormatter: data => moment(data.value).format('DD-MMM-YYYY')
-    }); */
-    this.columnDefs.push({
+    });
+    /*this.columnDefs.push({
       width: 95,
       headerName: 'Date',
       field: 'dateString'
-    });
+    });*/
     this.columnDefs.push({ headerName: 'Name', field: 'name', width: 92 });
     this.columnDefs.push({ headerName: 'Description', field: 'description', width: 578 }); //, width: 614
     this.columnDefs.push({ headerName: 'DescriptionComment', field: 'descriptionComment', width: 335 });
     this.columnDefs.push({ headerName: 'Amount', field: 'amount', width: 88 });
-    this.columnDefs.push({ headerName: 'Bank', field: 'bankName', width: 75 });
+    this.columnDefs.push({
+      headerName: 'Bank',
+      field: 'isCiti',
+      width: 75,
+      valueFormatter: function(params) {
+        return params.value ? 'CITI' : 'HDFC';
+      }
+    });
 
     this.columnDefs.push({
       headerName: '+',
@@ -296,8 +331,9 @@ export class ProductOverviewComponent implements OnInit {
       }
       //this.hdfcStatementEntires.forEach(this.toAll(all));
       //this.citiStatementEntires.forEach(this.toAll(all));
-      this.allStatementEntires = Object.assign([], all);
+      this.allStatementEntires = all;
     }
+    //this.api.redrawRows();
   }
 
   private toAll(all: Entry[]): (value: Entry, index: number, array: Entry[]) => void {
@@ -307,9 +343,9 @@ export class ProductOverviewComponent implements OnInit {
   }
 
   private pushToAll(entry: Entry, all: Entry[]) {
-    const entryCopy = Object.assign({}, entry);
-    entryCopy.description = entryCopy.description; // + ' | ' + entryCopy.descriptionComment;
-    all.push(entryCopy);
+    //const entryCopy = Object.assign({}, entry);
+    //entryCopy.description = entryCopy.description; // + ' | ' + entryCopy.descriptionComment;
+    all.push(entry);
   }
 
   methodFromParent(entries) {
